@@ -29,13 +29,35 @@ function change_state()
     end
 end
 
--- Player functions
-player = {
-    x = 0, 
-    y = 0
-}
+-- Entities (aka Player, enemies, etc)
 
-function handle_player_input()
+Entity = {}
+Entity.__index = Entity
+
+function Entity.create(x,y,w,h)
+	local new_entity = {}
+	setmetatable(new_entity, Entity)
+
+	new_entity.x = x
+	new_entity.y = y
+	new_entity.h = h
+	new_entity.w = w
+
+	return new_entity
+end
+
+function Entity:collide(other_entity) 
+	return other_entity.x < self.x + self.w and self.x < other_entity.x + other_entity.w 
+        and other_entity.y < self.y + self.h and self.y < other_entity.y + other_entity.h
+end
+
+-- Add other vars as convenience to this player entity
+-- for example, the sprite number or the lives left ;)
+player = Entity.create(0,0,8,8)
+
+-- Player input
+
+function handle_input()
     -- left
     if btn(0) then
         player.x -= 1
@@ -64,20 +86,14 @@ function handle_player_input()
             player.y = 128
         end
     end
-end
 
--- pass the entity that you want to check for collision (ie an enemy) and the size of that
--- For example the entity can be something like this: 
---  enemy {
---      x = 10,
---      y = 20
--- }
---
-function player_intersects(entity, size)
-    -- put the size of your sprite for the player here
-    local player_size = 8
-    return entity.x < player.x + player_size and player.x < entity.x + size 
-        and entity.y < player.y + player_size and player.y < entity.y + size
+    -- button 1
+    if btn(4) then
+    end
+
+    -- button 2
+    if btn(5) then
+    end
 end
 
 -- Pico8 game funtions
@@ -163,7 +179,7 @@ function text_x_pos(text)
         return 0 
     end 
 
-   return SCREEN_SIZE / 2 - (width / 2)
+   return SCREEN_SIZE / 2 - flr(width / 2)
 
 end
 
